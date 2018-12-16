@@ -1,0 +1,9 @@
+return {
+    0x6007, -- LD V0, 0x7
+    0xF029, -- LD F, Vx
+    0x6101, -- LD V1, 0x1
+    0xD115, -- DRW V1, V1, 5
+    0xD005, -- DRW V1, V1, 5
+    0x603c, -- LD V0, 0xff
+    0xF018, -- LD ST, V0
+}

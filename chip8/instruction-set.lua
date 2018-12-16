@@ -1,6 +1,6 @@
 local dec2hex = require('src.helpers').dec2hex
 
-local bitops = require 'src.bitops'
+local bitops = require 'lib.bitops'
 local NOT = bitops.NOT
 local OR = bitops.OR
 local AND = bitops.AND
@@ -22,7 +22,7 @@ local LSHIFT = bitops.LSHIFT
 local function i_0nnn_SYS_addr(cpu, instruction)
     -- ignored
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 00E0 - CLS
@@ -30,13 +30,13 @@ end
 local function i_00E0_CLS(cpu, instruction)
     cpu:clearDisplay()
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 00EE - RET
 -- Return from a subroutine.
 local function i_00EE_RET(cpu, instruction)
-    cpu.ip = table.remove(cpu.stack) + 1
+    cpu.ip = table.remove(cpu.stack) + 2
 end
 
 -- 1nnn - JP addr
@@ -56,9 +56,9 @@ end
 -- Skip next instruction if Vx = kk.
 local function i_3xkk_SE_Vx_byte(cpu, instruction)
     if cpu.V[instruction._x__] == instruction.__kk then
-        cpu.ip = cpu.ip + 2
+        cpu.ip = cpu.ip + 4
     else
-        cpu.ip = cpu.ip + 1
+        cpu.ip = cpu.ip + 2
     end
 end
 
@@ -66,9 +66,9 @@ end
 -- Skip next instruction if Vx != kk.
 local function i_4xkk_SNE_Vx_byte(cpu, instruction)
     if cpu.V[instruction._x__] ~= instruction.__kk then
-        cpu.ip = cpu.ip + 2
+        cpu.ip = cpu.ip + 4
     else
-        cpu.ip = cpu.ip + 1
+        cpu.ip = cpu.ip + 2
     end
 end
 
@@ -76,9 +76,9 @@ end
 -- Skip next instruction if Vx = Vy.
 local function i_5xy0_SE_Vx_Vy(cpu, instruction)
     if cpu.V[instruction._x__] == cpu.V[instruction.__y_] then
-        cpu.ip = cpu.ip + 2
+        cpu.ip = cpu.ip + 4
     else
-        cpu.ip = cpu.ip + 1
+        cpu.ip = cpu.ip + 2
     end
 end
 
@@ -87,7 +87,7 @@ end
 local function i_6xkk_LD_Vx_byte(cpu, instruction)
     cpu.V[instruction._x__] = instruction.__kk
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 7xkk - ADD Vx, byte
@@ -99,7 +99,7 @@ local function i_7xkk_ADD_Vx_byte(cpu, instruction)
     end
     cpu.V[instruction._x__] = v
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 8xy0 - LD Vx, Vy
@@ -107,7 +107,7 @@ end
 local function i_8xy0_LD_Vx_Vy(cpu, instruction)
     cpu.V[instruction._x__] = cpu.V[instruction.__y_]
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 8xy1 - OR Vx, Vy
@@ -116,7 +116,7 @@ local function i_8xy1_OR_Vx_Vy(cpu, instruction)
     cpu.V[instruction._x__] =
         OR(cpu.V[instruction._x__], cpu.V[instruction.__y_])
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 8xy2 - AND Vx, Vy
@@ -125,7 +125,7 @@ local function i_8xy2_AND_Vx_Vy(cpu, instruction)
     cpu.V[instruction._x__] =
         AND(cpu.V[instruction._x__], cpu.V[instruction.__y_])
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 8xy3 - XOR Vx, Vy
@@ -134,7 +134,7 @@ local function i_8xy3_XOR_Vx_Vy(cpu, instruction)
     cpu.V[instruction._x__] =
         XOR(cpu.V[instruction._x__], cpu.V[instruction.__y_])
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 8xy4 - ADD Vx, Vy
@@ -148,7 +148,7 @@ local function i_8xy4_ADD_Vx_Vy(cpu, instruction)
     end
     cpu.V[instruction._x__] = v
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 8xy5 - SUB Vx, Vy
@@ -162,7 +162,7 @@ local function i_8xy5_SUB_Vx_Vy(cpu, instruction)
     end
     cpu.V[instruction._x__] = v
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 8xy6 - SHR Vx, Vy
@@ -171,7 +171,7 @@ local function i_8xy6_SHR_Vx_Vy(cpu, instruction)
     cpu.V[0xf] = AND(0x1, cpu.V[instruction.__y_])
     cpu.V[instruction._x__] = RSHIFT(cpu.V[instruction.__y_], 1)
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 8xy7 - SUBN Vx, Vy
@@ -187,7 +187,7 @@ local function i_8xy7_SUBN_Vx_Vy(cpu, instruction)
 
     -- If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy,
     -- and the results stored in Vx.
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 8xyE - SHL Vx, Vy
@@ -196,16 +196,16 @@ local function i_8xyE_SHL_Vx_Vy(cpu, instruction)
     cpu.V[0xf] = RSHIFT(cpu.V[instruction.__y_], 7)
     cpu.V[instruction._x__] = AND(0xff, LSHIFT(cpu.V[instruction.__y_], 1))
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- 9xy0 - SNE Vx, Vy
 -- Skip next instruction if Vx != Vy.
 local function i_9xy0_SNE_Vx_Vy(cpu, instruction)
     if cpu.V[instruction._x__] ~= cpu.V[instruction.__y_] then
-        cpu.ip = cpu.ip + 2
+        cpu.ip = cpu.ip + 4
     else
-        cpu.ip = cpu.ip + 1
+        cpu.ip = cpu.ip + 2
     end
 end
 
@@ -214,7 +214,7 @@ end
 local function i_Annn_LD_I_addr(cpu, instruction)
     cpu.I = instruction._nnn
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Bnnn - JP V0, addr
@@ -228,7 +228,7 @@ end
 local function i_Cxkk_RND_Vx_byte(cpu, instruction)
     cpu.V[instruction._x__] = AND(math.random(0, 0xff), instruction.__kk)
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Dxyn - DRW Vx, Vy, nybble
@@ -263,16 +263,16 @@ local function i_Dxyn_DRW_Vx_Vy_nybble(cpu, instruction)
         end
     end
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Ex9E - SKP Vx
 -- Skip next instruction if key with the value of Vx is pressed.
 local function i_Ex9E_SKP_Vx(cpu, instruction)
     if (cpu.K[cpu.V[instruction._x__]] or 0) > 0 then
-        cpu.ip = cpu.ip + 2
+        cpu.ip = cpu.ip + 4
     else
-        cpu.ip = cpu.ip + 1
+        cpu.ip = cpu.ip + 2
     end
 end
 
@@ -280,9 +280,9 @@ end
 -- Skip next instruction if key with the value of Vx is not pressed.
 local function i_ExA1_SKNP_Vx(cpu, instruction)
     if (cpu.K[cpu.V[instruction._x__]] or 0) <= 0 then
-        cpu.ip = cpu.ip + 2
+        cpu.ip = cpu.ip + 4
     else
-        cpu.ip = cpu.ip + 1
+        cpu.ip = cpu.ip + 2
     end
 end
 
@@ -291,7 +291,7 @@ end
 local function i_Fx07_LD_Vx_DT(cpu, instruction)
     cpu.V[instruction._x__] = cpu.DT
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Fx0A - LD Vx, K
@@ -299,7 +299,7 @@ end
 local function i_Fx0A_LD_Vx_K(cpu, instruction)
     cpu.waitingForKeyPress = instruction._x__
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Fx15 - LD DT, Vx
@@ -307,7 +307,7 @@ end
 local function i_Fx15_LD_DT_Vx(cpu, instruction)
     cpu.DT = cpu.V[instruction._x__]
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Fx18 - LD ST, Vx
@@ -315,7 +315,7 @@ end
 local function i_Fx18_LD_ST_Vx(cpu, instruction)
     cpu.ST = cpu.V[instruction._x__]
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Fx1E - ADD I, Vx
@@ -323,7 +323,7 @@ end
 local function i_Fx1E_ADD_I_Vx(cpu, instruction)
     cpu.I = cpu.I + cpu.V[instruction._x__]
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Fx29 - LD F, Vx
@@ -331,7 +331,7 @@ end
 local function i_Fx29_LD_F_Vx(cpu, instruction)
     cpu.I = cpu.V[instruction._x__] * 5
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Fx33 - LD B, Vx
@@ -345,7 +345,7 @@ local function i_Fx33_LD_B_Vx(cpu, instruction)
     num = num % 10
     cpu.memory[cpu.I + 2] = num
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Fx55 - LD [I], Vx
@@ -357,7 +357,7 @@ local function i_Fx55_LD_I_Vx(cpu, instruction)
         cpu.I = cpu.I + 1
     end
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- Fx65 - LD Vx, [I]
@@ -369,7 +369,7 @@ local function i_Fx65_LD_Vx_I(cpu, instruction)
         cpu.I = cpu.I + 1
     end
 
-    cpu.ip = cpu.ip + 1
+    cpu.ip = cpu.ip + 2
 end
 
 -- instruction decoding code
@@ -390,7 +390,7 @@ local mapping = {
     [0x4] = i_4xkk_SNE_Vx_byte,
     [0x5] = function (cpu, instruction)
         if instruction.___n ~= 0 then
-            error("Invalid Instruction: " .. dec2hex(instruction.raw))
+            error('Invalid Instruction: ' .. dec2hex(instruction.raw))
         end
 
         i_5xy0_SE_Vx_Vy(cpu, instruction)
@@ -411,14 +411,14 @@ local mapping = {
         })[instruction.___n]
 
         if not f then
-            error("Invalid Instruction: " .. dec2hex(instruction.raw))
+            error('Invalid Instruction: ' .. dec2hex(instruction.raw))
         end
 
         f(cpu, instruction)
     end,
     [0x9] = function (cpu, instruction)
         if instruction.___n ~= 0 then
-            error("Invalid Instruction: " .. dec2hex(instruction.raw))
+            error('Invalid Instruction: ' .. dec2hex(instruction.raw))
         end
 
         i_9xy0_SNE_Vx_Vy(cpu, instruction)
@@ -434,7 +434,7 @@ local mapping = {
         })[instruction.__kk]
 
         if not f then
-            error("Invalid Instruction: " .. dec2hex(instruction.raw))
+            error('Invalid Instruction: ' .. dec2hex(instruction.raw))
         end
 
         f(cpu, instruction)
@@ -453,7 +453,7 @@ local mapping = {
         })[instruction.__kk]
 
         if not f then
-            error("Invalid Instruction: " .. dec2hex(instruction.raw))
+            error('Invalid Instruction: ' .. dec2hex(instruction.raw))
         end
 
         f(cpu, instruction)
@@ -463,7 +463,7 @@ local mapping = {
 return function (instruction)
     local f = mapping[instruction.o___]
     if not f then
-        error("Invalid Instruction: " .. dec2hex(instruction.raw))
+        error('Invalid Instruction: ' .. dec2hex(instruction.raw))
     end
     return f
 end

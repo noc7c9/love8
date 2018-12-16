@@ -1,7 +1,7 @@
 local iprint = require('src.helpers').iprint
 local dec2hex = require('src.helpers').dec2hex
 
-local chip8 = require 'src.chip8'
+local chip8 = require 'chip8.init'
 
 local tests = {}
 
@@ -29,7 +29,7 @@ end
 --- tests ---------------------------------------------------------------------
 
 test('00E0 - CLS', {
-    0x00E0,
+    0x00E0, -- CLS
 }, function (cpu)
     cpu.display[0] = 1
     cpu:runCycles()
@@ -37,20 +37,20 @@ test('00E0 - CLS', {
 end)
 
 test('00EE - RET', {
-    0x6000, -- LD V0, 0
-    0x2208, -- CALL 0x208
-    0x1202, -- JP 202
+    0x6000, -- 200 LD V0, 0
+    0x2210, -- 202 CALL 0x210
+    0x1204, -- 204 JP 0x204
 
-    0x7001, -- ADD V0, 0x1
-    0x2206, -- CALL 0x206
-    0x00EE, -- RET
+    0x7001, -- 206 ADD V0, 0x1
+    0x220c, -- 208 CALL 0x20c
+    0x00EE, -- 20a RET
 
-    0x7002, -- ADD V0, 0x2
-    0x00EE, -- RET
+    0x7002, -- 20c ADD V0, 0x2
+    0x00EE, -- 20e RET
 
-    0x7003, -- ADD V0, 0x3
-    0x2203, -- CALL 0x203
-    0x00EE, -- RET
+    0x7003, -- 210 ADD V0, 0x3
+    0x2206, -- 212 CALL 0x206
+    0x00EE, -- 214 RET
 }, function (cpu)
     cpu:runCycles(200)
 
@@ -59,15 +59,15 @@ test('00EE - RET', {
 end)
 
 test('1nnn - JP addr', {
-    0x6011, -- LD V0, 11
-    0x6111, -- LD V1, 11
-    0x6211, -- LD V2, 11
-    0x6311, -- LD V3, 11
-    0x1207, -- JP 207
-    0x6022, -- LD V0, 22
-    0x6122, -- LD V1, 22
-    0x6222, -- LD V2, 22
-    0x6322, -- LD V3, 22
+    0x6011, -- LD V0, 0x11
+    0x6111, -- LD V1, 0x11
+    0x6211, -- LD V2, 0x11
+    0x6311, -- LD V3, 0x11
+    0x120e, -- JP 0x20e
+    0x6022, -- LD V0, 0x22
+    0x6122, -- LD V1, 0x22
+    0x6222, -- LD V2, 0x22
+    0x6322, -- LD V3, 0x22
 }, function (cpu)
     cpu:runCycles()
 
@@ -78,12 +78,12 @@ test('1nnn - JP addr', {
 end)
 
 test('2nnn - CALL addr', {
-    0x6011, -- LD V0, 11
-    0x2203, -- CALL 203
-    0x1202, -- JP 202
+    0x6011, -- LD V0, 0x11
+    0x2206, -- CALL 0x206
+    0x1204, -- JP 0x204
 
-    0x6022, -- LD V0, 22
-    0x1204, -- JP 204
+    0x6022, -- LD V0, 0x22
+    0x1208, -- JP 0x208
 }, function (cpu)
     cpu:runCycles()
 
@@ -92,13 +92,13 @@ test('2nnn - CALL addr', {
 end)
 
 test('3xkk - SE Vx, byte', {
-    0x60aa, -- LD V0, aa
-    0x30aa, -- SE V0, aa
-    0x60ff, -- LD V0, ff
+    0x60aa, -- LD V0, 0xaa
+    0x30aa, -- SE V0, 0xaa
+    0x60ff, -- LD V0, 0xff
 
-    0x61ff, -- LD V1, bb
-    0x3100, -- SE V1, 00
-    0x61aa, -- LD V1, aa
+    0x61ff, -- LD V1, 0xbb
+    0x3100, -- SE V1, 0x00
+    0x61aa, -- LD V1, 0xaa
 }, function (cpu)
     cpu:runCycles()
 
@@ -107,13 +107,13 @@ test('3xkk - SE Vx, byte', {
 end)
 
 test('4xkk - SNE Vx, byte', {
-    0x60aa, -- LD V0, aa
-    0x40aa, -- SNE V0, aa
-    0x60ff, -- LD V0, ff
+    0x60aa, -- LD V0, 0xaa
+    0x40aa, -- SNE V0, 0xaa
+    0x60ff, -- LD V0, 0xff
 
-    0x61ff, -- LD V1, bb
-    0x4100, -- SNE V1, 00
-    0x61aa, -- LD V1, aa
+    0x61ff, -- LD V1, 0xbb
+    0x4100, -- SNE V1, 0x00
+    0x61aa, -- LD V1, 0xaa
 }, function (cpu)
     cpu:runCycles()
 
@@ -122,15 +122,15 @@ test('4xkk - SNE Vx, byte', {
 end)
 
 test('5xy0 - SE Vx, Vy', {
-    0x6a11, -- LD Va, 11
-    0x6b11, -- LD Vb, 11
+    0x6a11, -- LD Va, 0x11
+    0x6b11, -- LD Vb, 0x11
     0x5ab0, -- SE Va, Vb
-    0x6aff, -- LD Va, ff
+    0x6aff, -- LD Va, 0xff
 
-    0x6cff, -- LD Vc, ff
-    0x6d11, -- LD Vd, 11
+    0x6cff, -- LD Vc, 0xff
+    0x6d11, -- LD Vd, 0x11
     0x5cd0, -- SE Vc, Vd
-    0x6c11, -- LD Va, 11
+    0x6c11, -- LD Va, 0x11
 }, function (cpu)
     cpu:runCycles()
 
@@ -139,22 +139,22 @@ test('5xy0 - SE Vx, Vy', {
 end)
 
 test('6xkk - LD Vx, byte', {
-    0x6001, -- LD V0, 01
-    0x6101, -- LD V1, 01
-    0x6202, -- LD V2, 02
-    0x6303, -- LD V3, 03
-    0x6405, -- LD V4, 05
-    0x6508, -- LD V5, 08
-    0x660d, -- LD V6, 0d
-    0x6715, -- LD V7, 15
-    0x6822, -- LD V8, 22
-    0x6937, -- LD V9, 37
-    0x6a59, -- LD Va, 59
-    0x6b90, -- LD Vb, 90
-    0x6ce9, -- LD Vc, e9
-    0x6d79, -- LD Vd, 79
-    0x6e62, -- LD Ve, 62
-    0x6fdb, -- LD Vf, db
+    0x6001, -- LD V0, 0x01
+    0x6101, -- LD V1, 0x01
+    0x6202, -- LD V2, 0x02
+    0x6303, -- LD V3, 0x03
+    0x6405, -- LD V4, 0x05
+    0x6508, -- LD V5, 0x08
+    0x660d, -- LD V6, 0x0d
+    0x6715, -- LD V7, 0x15
+    0x6822, -- LD V8, 0x22
+    0x6937, -- LD V9, 0x37
+    0x6a59, -- LD Va, 0x59
+    0x6b90, -- LD Vb, 0x90
+    0x6ce9, -- LD Vc, 0xe9
+    0x6d79, -- LD Vd, 0x79
+    0x6e62, -- LD Ve, 0x62
+    0x6fdb, -- LD Vf, 0xdb
 }, function (cpu)
     cpu:runCycles()
 
@@ -177,11 +177,11 @@ test('6xkk - LD Vx, byte', {
 end)
 
 test('7xkk - ADD Vx, byte', {
-    0x6a02, -- LD Va, 02
-    0x7a02, -- ADD Va, 02
-    0x7a02, -- ADD Va, 02
-    0x7a02, -- ADD Va, 02
-    0x7a02, -- ADD Va, 02
+    0x6a02, -- LD Va, 0x02
+    0x7a02, -- ADD Va, 0x02
+    0x7a02, -- ADD Va, 0x02
+    0x7a02, -- ADD Va, 0x02
+    0x7a02, -- ADD Va, 0x02
 }, function (cpu)
     cpu:runCycles()
 
@@ -189,7 +189,7 @@ test('7xkk - ADD Vx, byte', {
 end)
 
 test('8xy0 - LD Vx, Vy', {
-    0x6b04, -- LD Vb, 04
+    0x6b04, -- LD Vb, 0x04
     0x80b0, -- LD V0, Vb
 }, function (cpu)
     cpu:runCycles()
@@ -199,8 +199,8 @@ test('8xy0 - LD Vx, Vy', {
 end)
 
 test('8xy1 - OR Vx, Vy', {
-    0x6a60, -- LD Va, 60 (0110 0000)
-    0x6b06, -- LD Vb, 06 (0000 0110)
+    0x6a60, -- LD Va, 0x60 (0110 0000)
+    0x6b06, -- LD Vb, 0x06 (0000 0110)
     0x8ab1, -- OR Va, Vb
 }, function (cpu)
     cpu:runCycles()
@@ -210,8 +210,8 @@ test('8xy1 - OR Vx, Vy', {
 end)
 
 test('8xy2 - AND Vx, Vy', {
-    0x6a78, -- LD Va, 78 (0111 1000)
-    0x6b1e, -- LD Vb, 1e (0001 1110)
+    0x6a78, -- LD Va, 0x78 (0111 1000)
+    0x6b1e, -- LD Vb, 0x1e (0001 1110)
     0x8ab2, -- AND Va, Vb
 }, function (cpu)
     cpu:runCycles()
@@ -221,8 +221,8 @@ test('8xy2 - AND Vx, Vy', {
 end)
 
 test('8xy3 - XOR Vx, Vy', {
-    0x6aff, -- LD Va, ff (1111 1111)
-    0x6b1e, -- LD Vb, 1e (0001 1110)
+    0x6aff, -- LD Va, 0xff (1111 1111)
+    0x6b1e, -- LD Vb, 0x1e (0001 1110)
     0x8ab3, -- XOR Va, Vb
 }, function (cpu)
     cpu:runCycles()
@@ -232,12 +232,12 @@ test('8xy3 - XOR Vx, Vy', {
 end)
 
 test('8xy4 - ADD Vx, Vy', {
-    0x6a07, -- LD Va, 07
-    0x6b08, -- LD Vb, 08
+    0x6a07, -- LD Va, 0x07
+    0x6b08, -- LD Vb, 0x08
     0x8ab4, -- ADD Va, Vb
 
-    0x6aff, -- LD Va, ff
-    0x6b02, -- LD Vb, 02
+    0x6aff, -- LD Va, 0xff
+    0x6b02, -- LD Vb, 0x02
     0x8ab4, -- ADD Va, Vb
 }, function (cpu)
     cpu:runCycles(3)
@@ -254,12 +254,12 @@ test('8xy4 - ADD Vx, Vy', {
 end)
 
 test('8xy5 - SUB Vx, Vy', {
-    0x6a0a, -- LD Va, 0a
-    0x6b05, -- LD Vb, 05
+    0x6a0a, -- LD Va, 0x0a
+    0x6b05, -- LD Vb, 0x05
     0x8ab5, -- SUB Va, Vb
 
-    0x6a05, -- LD Va, 05
-    0x6b0a, -- LD Vb, 0a
+    0x6a05, -- LD Va, 0x05
+    0x6b0a, -- LD Vb, 0x0a
     0x8ab5, -- SUB Va, Vb
 }, function (cpu)
     cpu:runCycles(3)
@@ -276,8 +276,8 @@ test('8xy5 - SUB Vx, Vy', {
 end)
 
 test('8xy6 - SHR Vx, Vy', {
-    0x6aff, -- LD Va, ff
-    0x6b06, -- LD Vb, 05
+    0x6aff, -- LD Va, 0xff
+    0x6b06, -- LD Vb, 0x05
     0x8ab6, -- SHR Vx, Vy
     0x8aa6, -- SHR Vx, Vx
 }, function (cpu)
@@ -295,12 +295,12 @@ test('8xy6 - SHR Vx, Vy', {
 end)
 
 test('8xy7 - SUBN Vx, Vy', {
-    0x6a07, -- LD Va, 0a
-    0x6b0a, -- LD Vb, 05
+    0x6a07, -- LD Va, 0x0a
+    0x6b0a, -- LD Vb, 0x05
     0x8ab7, -- SUBN Va, Vb
 
-    0x6a0a, -- LD Va, 0a
-    0x6b05, -- LD Vb, 05
+    0x6a0a, -- LD Va, 0x0a
+    0x6b05, -- LD Vb, 0x05
     0x8ab7, -- SUBN Va, Vb
 }, function (cpu)
     cpu:runCycles(3)
@@ -317,8 +317,8 @@ test('8xy7 - SUBN Vx, Vy', {
 end)
 
 test('8xyE - SHL Vx, Vy', {
-    0x6aff, -- LD Va, ff
-    0x6b60, -- LD Vb, 60
+    0x6aff, -- LD Va, 0xff
+    0x6b60, -- LD Vb, 0x60
     0x8abE, -- SHR Vx, Vy
     0x8aaE, -- SHR Vx, Vx
 }, function (cpu)
@@ -336,15 +336,15 @@ test('8xyE - SHL Vx, Vy', {
 end)
 
 test('9xy0 - SNE Vx, Vy', {
-    0x6aff, -- LD Va, ff
-    0x6bff, -- LD Vb, ff
+    0x6aff, -- LD Va, 0xff
+    0x6bff, -- LD Vb, 0xff
     0x9ab0, -- SNE Va, Vb
-    0x6a11, -- LD Va, 11
+    0x6a11, -- LD Va, 0x11
 
-    0x6c11, -- LD Vc, 11
-    0x6dff, -- LD Vd, ff
+    0x6c11, -- LD Vc, 0x11
+    0x6dff, -- LD Vd, 0xff
     0x9cd0, -- SNE Vc, Vd
-    0x6cff, -- LD Vc, ff
+    0x6cff, -- LD Vc, 0xff
 }, function (cpu)
     cpu:runCycles()
 
@@ -353,9 +353,9 @@ test('9xy0 - SNE Vx, Vy', {
 end)
 
 test('Annn - LD I, addr', {
-    0xA111, -- LD I, 111
-    0xA222, -- LD I, 222
-    0xA333, -- LD I, 333
+    0xA111, -- LD I, 0x111
+    0xA222, -- LD I, 0x222
+    0xA333, -- LD I, 0x333
 }, function (cpu)
     cpu:runCycles(1)
     assert(cpu.I == 0x111)
@@ -366,58 +366,58 @@ test('Annn - LD I, addr', {
 end)
 
 test('Bnnn - JP V0, addr', {
-    0x6007, -- LD V0, 7
-    0x6111, -- LD V1, 11
-    0x6211, -- LD V2, 11
-    0x6311, -- LD V3, 11
-    0xB200, -- JP V0, 200
-    0x6022, -- LD V0, 22
-    0x6122, -- LD V1, 22
-    0x6222, -- LD V2, 22
-    0x6322, -- LD V3, 22
+    0x600e, -- LD V0, 0x0e
+    0x6111, -- LD V1, 0x11
+    0x6211, -- LD V2, 0x11
+    0x6311, -- LD V3, 0x11
+    0xB200, -- JP V0, 0x200
+    0x6022, -- LD V0, 0x22
+    0x6122, -- LD V1, 0x22
+    0x6222, -- LD V2, 0x22
+    0x6322, -- LD V3, 0x22
 }, function (cpu)
     cpu:runCycles()
 
-    assert(cpu.V[0x0] == 0x07)
+    assert(cpu.V[0x0] == 0x0e)
     assert(cpu.V[0x1] == 0x11)
     assert(cpu.V[0x2] == 0x22)
     assert(cpu.V[0x3] == 0x22)
 end)
 
 test('Cxkk - RND Vx, byte', {
-    0x6000, -- LD V0, 00
-    0x6100, -- LD V1, 00
-    0x6200, -- LD V2, 00
-    0x6300, -- LD V3, 00
-    0x6400, -- LD V4, 00
-    0x6500, -- LD V5, 00
-    0x6600, -- LD V6, 00
-    0x6700, -- LD V7, 00
-    0x6800, -- LD V8, 00
-    0x6900, -- LD V9, 00
-    0x6a00, -- LD VA, 00
-    0x6b00, -- LD VB, 00
-    0x6c00, -- LD VC, 00
-    0x6d00, -- LD VD, 00
-    0x6e00, -- LD VE, 00
-    0x6f00, -- LD VF, 00
+    0x6000, -- LD V0, 0
+    0x6100, -- LD V1, 0
+    0x6200, -- LD V2, 0
+    0x6300, -- LD V3, 0
+    0x6400, -- LD V4, 0
+    0x6500, -- LD V5, 0
+    0x6600, -- LD V6, 0
+    0x6700, -- LD V7, 0
+    0x6800, -- LD V8, 0
+    0x6900, -- LD V9, 0
+    0x6a00, -- LD VA, 0
+    0x6b00, -- LD VB, 0
+    0x6c00, -- LD VC, 0
+    0x6d00, -- LD VD, 0
+    0x6e00, -- LD VE, 0
+    0x6f00, -- LD VF, 0
 
-    0xC0ff, -- RND V0, ff
-    0xC1ff, -- RND V1, ff
-    0xC2ff, -- RND V2, ff
-    0xC3ff, -- RND V3, ff
-    0xC4ff, -- RND V4, ff
-    0xC5ff, -- RND V5, ff
-    0xC6ff, -- RND V6, ff
-    0xC7ff, -- RND V7, ff
-    0xC8ff, -- RND V8, ff
-    0xC9ff, -- RND V9, ff
-    0xCaff, -- RND VA, ff
-    0xCbff, -- RND VB, ff
-    0xCcff, -- RND VC, ff
-    0xCdff, -- RND VD, ff
-    0xCeff, -- RND VE, ff
-    0xCfff, -- RND VF, ff
+    0xC0ff, -- RND V0, 0xff
+    0xC1ff, -- RND V1, 0xff
+    0xC2ff, -- RND V2, 0xff
+    0xC3ff, -- RND V3, 0xff
+    0xC4ff, -- RND V4, 0xff
+    0xC5ff, -- RND V5, 0xff
+    0xC6ff, -- RND V6, 0xff
+    0xC7ff, -- RND V7, 0xff
+    0xC8ff, -- RND V8, 0xff
+    0xC9ff, -- RND V9, 0xff
+    0xCaff, -- RND VA, 0xff
+    0xCbff, -- RND VB, 0xff
+    0xCcff, -- RND VC, 0xff
+    0xCdff, -- RND VD, 0xff
+    0xCeff, -- RND VE, 0xff
+    0xCfff, -- RND VF, 0xff
 }, function (cpu)
     cpu:runCycles()
 
@@ -459,15 +459,15 @@ test('Dxyn - DRW Vx, Vy, nybble', {
 end)
 
 test('Ex9E - SKP Vx', {
-    0x6001, -- LD V0, 1
+    0x6001, -- LD V0, 0x1
 
-    0x61aa, -- LD V0, aa
+    0x61aa, -- LD V0, 0xaa
     0xE09E, -- SKP V0
-    0x61ff, -- LD V0, ff
+    0x61ff, -- LD V0, 0xff
 
-    0x62ff, -- LD V1, bb
+    0x62ff, -- LD V1, 0xbb
     0xE09E, -- SKP V0
-    0x62aa, -- LD V1, aa
+    0x62aa, -- LD V1, 0xaa
 }, function (cpu)
     cpu.K[0x1] = 1
     cpu:runCycles(4)
@@ -481,13 +481,13 @@ end)
 test('ExA1 - SKNP Vx', {
     0x6001, -- LD V0, 1
 
-    0x61aa, -- LD V0, aa
+    0x61aa, -- LD V0, 0xaa
     0xE0A1, -- SKNP V0
-    0x61ff, -- LD V0, ff
+    0x61ff, -- LD V0, 0xff
 
-    0x62ff, -- LD V1, bb
+    0x62ff, -- LD V1, 0xbb
     0xE0A1, -- SKNP V0
-    0x62aa, -- LD V1, aa
+    0x62aa, -- LD V1, 0xaa
 }, function (cpu)
     cpu.K[0x1] = 0
     cpu:runCycles(4)
@@ -499,8 +499,8 @@ test('ExA1 - SKNP Vx', {
 end)
 
 test('Fx07 - LD Vx, DT', {
-    0x61ff, -- LD V1, ff
-    0x6011, -- LD V0, 11
+    0x61ff, -- LD V1, 0xff
+    0x6011, -- LD V0, 0x11
     0xF015, -- LD DT, V0
     0xF107, -- LD V1, DT
 }, function (cpu)
@@ -524,21 +524,21 @@ test('Fx0A - LD Vx, K', {
 end)
 
 test('Fx15 - LD DT, Vx', {
-    0x6011, -- LD V0, 11
+    0x60ff, -- LD V0, 0xff
     0xF015, -- LD DT, V0
 }, function (cpu)
     cpu:runCycles()
 
-    assert(cpu.DT == 0x11)
+    assert(cpu.DT ~= 0) -- note: DT would change so no direct compare
 end)
 
 test('Fx18 - LD ST, Vx', {
-    0x6011, -- LD V0, 11
+    0x6011, -- LD V0, 0x11
     0xF018, -- LD ST, V0
 }, function (cpu)
     cpu:runCycles()
 
-    assert(cpu.ST == 0x11)
+    assert(cpu.ST ~= 0)
 end)
 
 test('Fx1E - ADD I, Vx', {

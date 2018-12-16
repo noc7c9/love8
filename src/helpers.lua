@@ -25,7 +25,7 @@ function helpers.dec2hex(value, padding)
     end
 
     -- pad result
-    padding = padding or 4
+    padding = padding or 2
     while output:len() < padding do
         output = '0' .. output
     end
