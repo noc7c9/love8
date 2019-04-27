@@ -1,6 +1,6 @@
 function love.conf(t)
     t.identity = 'love8'
-    t.version = '0.10.0'
+    t.version = '11.2'
     t.console = true
 
     t.window.title = 'Love8 - Chip-8 Interpretor'
