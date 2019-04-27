@@ -157,7 +157,7 @@ function Interpreter:loadProgramBinary(program)
     -- convert program code into a stream of words (2 bytes/16 bits)
     local i = 1
     local l = string.len(program)
-    while (i < l) do
+    while (i <= l) do
         local a, b = program:byte(i, i + 1)
         i = i + 2
 
@@ -180,7 +180,7 @@ function Interpreter:loadProgram(instructions)
         p = p + 2
     end
 
-    -- set 0x000-0xfff in memory to zero
+    -- set 0x000-0x1ff in memory to zero
     for i = 0, (PROGRAM_START_ADDR-1) do
         self.memory[i] = 0
     end
