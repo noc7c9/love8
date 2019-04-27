@@ -76,7 +76,7 @@ function Love8:draw()
     for y = 0, (h - 1) do
         for x = 0, (w - 1) do
             if display[y * w + x] > 0 then
-                rect('fill', x * 10 + 1, y * 10 + 1, 8, 8)
+                rect('fill', x * 10, y * 10, 10, 10)
             end
         end
     end
