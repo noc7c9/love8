@@ -66,10 +66,6 @@ function Love8:update(dt)
 end
 
 function Love8:draw()
-    if self.displayInternals then
-        self.internalsOverlay:draw()
-    end
-
     local w, h = self.interpreter.width, self.interpreter.height
     local display = self.interpreter.display
     local rect = love.graphics.rectangle
@@ -79,6 +75,10 @@ function Love8:draw()
                 rect('fill', x * 10, y * 10, 10, 10)
             end
         end
+    end
+
+    if self.displayInternals then
+        self.internalsOverlay:draw()
     end
 end
 

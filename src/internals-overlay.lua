@@ -33,6 +33,7 @@ function InternalsOverlay:drawMemory(ox, oy)
     local x, y = ox, oy - (14 * 0x200 / 4) -- start with the first 0xff bytes not visible
     local i = 0
     local l = #mem
+    love.graphics.setColor(255, 255, 255)
     while i <= l do
         print('0x' .. dec2hex(i, 3) .. ':', x, y)
 
@@ -158,6 +159,11 @@ function InternalsOverlay:draw()
     local x, y, w, h = PAD, PAD
     local w1, w2
     local xm, ym
+
+    -- transparent background
+    love.graphics.setColor(0, 0, 0, 0.75)
+    w, h = love.graphics.getDimensions()
+    love.graphics.rectangle('fill', 0, 0, w, h)
 
     w, h = self:drawMemory(x, y)
     x = x + w + PAD
