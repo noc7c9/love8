@@ -1,7 +1,6 @@
-local iprint = require('src.helpers').iprint
 local dec2hex = require('src.helpers').dec2hex
 
-local chip8 = require 'chip8.init'
+local interpreter = require('src.interpreter.init')
 
 local tests = {}
 
@@ -14,7 +13,7 @@ local function test(name, code, func)
 end
 
 local function runTests()
-    local cpu = chip8.new()
+    local cpu = interpreter.new()
     for i, test in ipairs(tests) do
         print('Test ' .. i .. ': ' .. test.name)
 
@@ -24,6 +23,13 @@ local function runTests()
     end
 
     print('\n' .. #tests .. ' tests passed!')
+end
+
+local function runInLove2D()
+    love.load = function ()
+        runTests()
+        love.event.quit()
+    end
 end
 
 --- tests ---------------------------------------------------------------------
@@ -631,6 +637,4 @@ test('Fx65 - LD Vx, [I]', {
     assert(cpu.I == 0x303)
 end)
 
--------------------------------------------------------------------------------
-
-runTests()
+runInLove2D()

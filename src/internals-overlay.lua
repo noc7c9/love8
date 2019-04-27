@@ -4,9 +4,9 @@ local print = love.graphics.print
 local InternalsOverlay = {}
 InternalsOverlay.__index = InternalsOverlay
 
-function InternalsOverlay.new(chip8)
+function InternalsOverlay.new(interpreter)
     local self = {
-        chip8 = chip8
+        interpreter = interpreter
     }
     setmetatable(self, InternalsOverlay)
     return self
@@ -15,8 +15,8 @@ end
 function InternalsOverlay:drawMemory(ox, oy)
     local color = love.graphics.setColor
 
-    local mem = self.chip8.memory
-    local ip = self.chip8.ip
+    local mem = self.interpreter.memory
+    local ip = self.interpreter.ip
 
     local function drawInst(index, x, y)
         if ip == index then
@@ -49,7 +49,7 @@ function InternalsOverlay:drawMemory(ox, oy)
 end
 
 function InternalsOverlay:drawRegisters(ox, oy)
-    local V = self.chip8.V
+    local V = self.interpreter.V
     local x, y = ox, oy
 
     print("Registers:", x, y)
@@ -76,13 +76,13 @@ function InternalsOverlay:drawRegisters(ox, oy)
     print("vF=" .. dec2hex(V[0xF], 2), x + 46 * 3, y)
 
     y = y + 14 + 4
-    print("I=" .. dec2hex(self.chip8.I, 3), x, y)
+    print("I=" .. dec2hex(self.interpreter.I, 3), x, y)
 
     return 46 * 4, y - oy + 14
 end
 
 function InternalsOverlay:drawKeys(ox, oy)
-    local K = self.chip8.K
+    local K = self.interpreter.K
     local x, y = ox, oy
 
     print("Keys:", x, y)
@@ -112,7 +112,7 @@ function InternalsOverlay:drawKeys(ox, oy)
 end
 
 function InternalsOverlay:drawStack(ox, oy)
-    local stack = self.chip8.stack
+    local stack = self.interpreter.stack
 
     local function drawAddr(addr, x, y)
         if addr then
@@ -160,21 +160,18 @@ function InternalsOverlay:draw()
     local xm, ym
 
     w, h = self:drawMemory(x, y)
-    -- box(x, y, w, h)
     x = x + w + PAD
 
     line(x, -10, x, 330)
     x = x + PAD + 2
 
     w1, h = self:drawRegisters(x, y)
-    -- box(x, y, w1, h)
     y = y + h + PAD
 
     line(x - PAD, y, x + w, y)
     y = y + PAD + 2
 
     w2, h = self:drawStack(x, y)
-    -- box(x, y, w2, h)
     w = math.max(w1, w2)
     x = x + w + PAD
 
@@ -182,9 +179,9 @@ function InternalsOverlay:draw()
     x = x + PAD + 2
 
     y = PAD
-    love.graphics.print("Sound: " .. self.chip8.ST, x, y)
+    love.graphics.print("Sound: " .. self.interpreter.ST, x, y)
     y = y + 14 + 4
-    love.graphics.print("Delay: " .. self.chip8.DT, x, y)
+    love.graphics.print("Delay: " .. self.interpreter.DT, x, y)
     y = y + 14 + PAD
 
     line(x - PAD, y, 640, y)

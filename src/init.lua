@@ -1,6 +1,6 @@
-local chip8 = require 'chip8'
-local internalsOverlay = require 'love8.internals-overlay'
-local demo = require 'love8.demo-program'
+local interpreter = require('src.interpreter')
+local internalsOverlay = require('src.internals-overlay')
+local demo = require('src.demo-program')
 
 local BEEP_FILE = 'beep.ogg'
 
@@ -17,14 +17,23 @@ Love8.__index = Love8
 function Love8.new()
     local self = {}
     setmetatable(self, Love8)
+
+    -- bind to Love2D
+    love.load        = function (...) self:load(...) end
+    love.update      = function (...) self:update(...) end
+    love.draw        = function (...) self:draw(...) end
+    love.keypressed  = function (...) self:keypressed(...) end
+    love.keyreleased = function (...) self:keyreleased(...) end
+    love.filedropped = function (...) self:filedropped(...) end
+
     return self
 end
 
 function Love8:load(args)
-    self.chip8 = chip8.new()
+    self.interpreter = interpreter.new()
 
     self.displayInternals = false
-    self.internalsOverlay = internalsOverlay.new(self.chip8)
+    self.internalsOverlay = internalsOverlay.new(self.interpreter)
 
     self.beep = love.audio.newSource(BEEP_FILE, 'static')
     self.beep:setLooping(true)
@@ -39,17 +48,17 @@ function Love8:load(args)
             love.event.quit(1)
         else
             contents = love.filesystem.read(file)
-            self.chip8:loadProgramBinary(contents)
+            self.interpreter:loadProgramBinary(contents)
         end
     else
-        self.chip8:loadProgram(demo)
+        self.interpreter:loadProgram(demo)
     end
 end
 
 function Love8:update(dt)
-    self.chip8:update(dt)
+    self.interpreter:update(dt)
 
-    if self.chip8.ST > 0 then
+    if self.interpreter.ST > 0 then
         self.beep:play()
     else
         self.beep:pause()
@@ -61,8 +70,8 @@ function Love8:draw()
         self.internalsOverlay:draw()
     end
 
-    local w, h = self.chip8.width, self.chip8.height
-    local display = self.chip8.display
+    local w, h = self.interpreter.width, self.interpreter.height
+    local display = self.interpreter.display
     local rect = love.graphics.rectangle
     for y = 0, (h - 1) do
         for x = 0, (w - 1) do
@@ -80,29 +89,21 @@ function Love8:keypressed(key)
         self.displayInternals = not self.displayInternals
     else
         if KEY_MAP[key] ~= nil then
-            self.chip8.K[KEY_MAP[key]] = 1
+            self.interpreter.K[KEY_MAP[key]] = 1
         end
     end
 end
 
 function Love8:keyreleased(key)
     if KEY_MAP[key] ~= nil then
-        self.chip8.K[KEY_MAP[key]] = 0
+        self.interpreter.K[KEY_MAP[key]] = 0
     end
 end
 
 function Love8:filedropped(file)
     file:open('r')
-    self.chip8:loadProgramBinary(file:read())
+    self.interpreter:loadProgramBinary(file:read())
 end
 
-function Love8:bindToLove()
-    love.load        = function (...) self:load(...) end
-    love.update      = function (...) self:update(...) end
-    love.draw        = function (...) self:draw(...) end
-    love.keypressed  = function (...) self:keypressed(...) end
-    love.keyreleased = function (...) self:keyreleased(...) end
-    love.filedropped = function (...) self:filedropped(...) end
-end
-
-return Love8
+-- Start Love8
+Love8.new()

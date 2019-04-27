@@ -1,1 +1,5 @@
-require('love8').new():bindToLove()
+if arg[2] == '--tests' then
+    require('tests')
+else
+    require('src')
+end

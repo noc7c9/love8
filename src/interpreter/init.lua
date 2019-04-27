@@ -1,4 +1,4 @@
-local decodeInstruction = require('chip8.instruction-set')
+local decodeInstruction = require('src.interpreter.instruction-set')
 
 local PROGRAM_START_ADDR = 0x200
 
@@ -27,12 +27,12 @@ local FONT_DATA = {
     {0xf0, 0x80, 0xf0, 0x80, 0x80}, -- F
 }
 
-local Chip8 = {}
-Chip8.__index = Chip8
+local Interpreter = {}
+Interpreter.__index = Interpreter
 
-function Chip8.new(program)
+function Interpreter.new(program)
     local self = {}
-    setmetatable(self, Chip8)
+    setmetatable(self, Interpreter)
 
     self:reset()
 
@@ -43,7 +43,7 @@ function Chip8.new(program)
     return self
 end
 
-function Chip8:reset()
+function Interpreter:reset()
     self.cycleCount = 0
     self.tickCount = 0
 
@@ -81,13 +81,13 @@ function Chip8:reset()
     }
 end
 
-function Chip8:clearDisplay()
+function Interpreter:clearDisplay()
     for i = 0, (WIDTH * HEIGHT) do
         self.display[i] = 0
     end
 end
 
-function Chip8:update(dt)
+function Interpreter:update(dt)
     self.cycleCount = self.cycleCount + dt
     while self.cycleCount > CYCLE_PERIOD do
         self.cycleCount = self.cycleCount - CYCLE_PERIOD
@@ -101,13 +101,13 @@ function Chip8:update(dt)
     end
 end
 
-function Chip8:tick()
+function Interpreter:tick()
     self.DT = math.max(0, self.DT - 1)
     self.ST = math.max(0, self.ST - 1)
 end
 
 -- one processor cycle, should be called with a frequency of 60Hz
-function Chip8:cycle()
+function Interpreter:cycle()
     -- wait for key press if necessary
     if self.waitingForKeyPress ~= nil then
         -- check if any key is pressed
@@ -151,7 +151,7 @@ function Chip8:cycle()
     decoded(self, instruction)
 end
 
-function Chip8:loadProgramBinary(program)
+function Interpreter:loadProgramBinary(program)
     local instructions = {}
 
     -- convert program code into a stream of words (2 bytes/16 bits)
@@ -168,7 +168,7 @@ function Chip8:loadProgramBinary(program)
     self:loadProgram(instructions)
 end
 
-function Chip8:loadProgram(instructions)
+function Interpreter:loadProgram(instructions)
     self:reset()
 
     -- read instructions (stream of words) into memory as a stream of bytes
@@ -194,11 +194,11 @@ function Chip8:loadProgram(instructions)
     end
 end
 
-function Chip8:runCycles(numOfCycles)
+function Interpreter:runCycles(numOfCycles)
     numOfCycles = numOfCycles or (#self.memory - PROGRAM_START_ADDR + 1)
     for i = 1, numOfCycles do
         self:cycle()
     end
 end
 
-return Chip8
+return Interpreter

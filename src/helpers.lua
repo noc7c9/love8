@@ -1,14 +1,4 @@
-local inspect = require 'lib.inspect'
-
 local helpers = {}
-
-function helpers.iprint(...)
-    local args = {...}
-    for i, v in ipairs(args) do
-        args[i] = inspect(v)
-    end
-    print(unpack(args))
-end
 
 function helpers.dec2hex(value, padding)
     local base = 16
