@@ -241,7 +241,7 @@ local function i_Dxyn_DRW_Vx_Vy_nybble(cpu, instruction)
         byte = cpu.memory[cpu.I + y] or 0
         for x = 1, w do
             x = w - x
-            i = (y + oy) * cpu.width + (x + ox)
+            i = (y + oy) % cpu.height * cpu.width + (x + ox) % cpu.width
 
             bit = BIT.band(byte, 0x1)
             byte = BIT.rshift(byte, 1)

@@ -2,7 +2,7 @@ local decodeInstruction = require('src.interpreter.instruction-set')
 
 local PROGRAM_START_ADDR = 0x200
 
-local CYCLE_PERIOD = 1 / 500
+local CYCLE_PERIOD = 1 / 2000
 local TICK_PERIOD = 1 / 60
 
 local WIDTH = 64
