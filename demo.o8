@@ -1,0 +1,117 @@
+# Compile using https://github.com/JohnEarnest/Octo
+#
+# Character font is https://fontenddev.com/fonts/owre-kynge
+
+:const height 9
+
+:const width_L 9
+: char_L
+    0b01111100
+    0b10111000
+    0b00010000
+    0b01110000
+    0b10110000
+    0b00110000
+    0b00110110
+    0b00101111
+    0b01011001
+
+:const width_o 6
+: char_o
+    0b00000000
+    0b00000000
+    0b00110000
+    0b01011000
+    0b11011000
+    0b11011000
+    0b11011000
+    0b11010000
+    0b01100000
+
+:const width_v 7
+: char_v
+    0b00000000
+    0b00000000
+    0b01001000
+    0b11101100
+    0b01101100
+    0b01101100
+    0b01101100
+    0b01111000
+    0b00010000
+
+:const width_e 6
+: char_e
+    0b00000000
+    0b00000000
+    0b00110000
+    0b11110000
+    0b11011000
+    0b11100000
+    0b11000000
+    0b11000000
+    0b01100000
+
+:const width_8 7
+: char_8
+    0b00110000
+    0b01011000
+    0b11001100
+    0b01111000
+    0b01111000
+    0b11001100
+    0b11001100
+    0b01101000
+    0b00110000
+
+# position of the logo
+:alias x v0
+:alias y v1
+
+:alias char_x v2
+:alias char_y v3
+
+: sync
+    vf := 2
+    delay := vf
+
+    loop
+        vf := delay
+        if vf != 0 then
+    again
+;
+
+: main
+    x := 0
+    y := 10
+
+    loop
+        clear
+
+        char_x := x
+        char_y := y
+
+        i := char_L
+        sprite char_x char_y height
+        char_x += width_L
+
+        i := char_o
+        sprite char_x char_y height
+        char_x += width_o
+
+        i := char_v
+        sprite char_x char_y height
+        char_x += width_v
+
+        i := char_e
+        sprite char_x char_y height
+        char_x += width_e
+
+        i := char_8
+        sprite char_x char_y height
+        char_x += width_8
+
+        x += -1
+
+        sync
+    again

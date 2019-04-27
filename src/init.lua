@@ -1,6 +1,5 @@
 local interpreter = require('src.interpreter')
 local internalsOverlay = require('src.internals-overlay')
-local demo = require('src.demo-program')
 
 local BEEP_FILE = 'beep.ogg'
 
@@ -51,7 +50,8 @@ function Love8:load(args)
             self.interpreter:loadProgramBinary(contents)
         end
     else
-        self.interpreter:loadProgram(demo)
+        contents = love.filesystem.read('demo.ch8')
+        self.interpreter:loadProgramBinary(contents)
     end
 end
 
