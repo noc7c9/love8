@@ -6,7 +6,7 @@ local decodeInstruction = require('chip8.instruction-set')
 
 local PROGRAM_START_ADDR = 0x200
 
-local CYCLE_PERIOD = 1 / 600
+local CYCLE_PERIOD = 1 / 500
 local TICK_PERIOD = 1 / 60
 
 local WIDTH = 64
