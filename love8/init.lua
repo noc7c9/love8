@@ -30,8 +30,17 @@ function Love8:load(args)
     self.beep:setLooping(true)
 
     -- parse args
-    if #args > 1 then
-        self.chip8:loadProgramBinary(arg[2])
+    if #args > 0 then
+        file = args[1]
+        file = file:gsub('\\', '/')
+        info = love.filesystem.getInfo(file)
+        if info == nil then
+            print(file, 'not found')
+            love.event.quit(1)
+        else
+            contents = love.filesystem.read(file)
+            self.chip8:loadProgramBinary(contents)
+        end
     else
         self.chip8:loadProgram(demo)
     end
