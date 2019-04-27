@@ -1,12 +1,6 @@
 local dec2hex = require('src.helpers').dec2hex
 
-local bitops = require 'lib.bitops'
-local NOT = bitops.NOT
-local OR = bitops.OR
-local AND = bitops.AND
-local XOR = bitops.XOR
-local RSHIFT = bitops.RSHIFT
-local LSHIFT = bitops.LSHIFT
+local BIT = bit
 
 -- references:
 -- http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#2.5
@@ -114,7 +108,7 @@ end
 -- Set Vx = Vx OR Vy.
 local function i_8xy1_OR_Vx_Vy(cpu, instruction)
     cpu.V[instruction._x__] =
-        OR(cpu.V[instruction._x__], cpu.V[instruction.__y_])
+        BIT.bor(cpu.V[instruction._x__], cpu.V[instruction.__y_])
 
     cpu.ip = cpu.ip + 2
 end
@@ -123,7 +117,7 @@ end
 -- Set Vx = Vx AND Vy.
 local function i_8xy2_AND_Vx_Vy(cpu, instruction)
     cpu.V[instruction._x__] =
-        AND(cpu.V[instruction._x__], cpu.V[instruction.__y_])
+        BIT.band(cpu.V[instruction._x__], cpu.V[instruction.__y_])
 
     cpu.ip = cpu.ip + 2
 end
@@ -132,7 +126,7 @@ end
 -- Set Vx = Vx XOR Vy.
 local function i_8xy3_XOR_Vx_Vy(cpu, instruction)
     cpu.V[instruction._x__] =
-        XOR(cpu.V[instruction._x__], cpu.V[instruction.__y_])
+        BIT.bxor(cpu.V[instruction._x__], cpu.V[instruction.__y_])
 
     cpu.ip = cpu.ip + 2
 end
@@ -168,8 +162,8 @@ end
 -- 8xy6 - SHR Vx, Vy
 -- Set Vx = Vy SHR 1, set VF = bit shifted out
 local function i_8xy6_SHR_Vx_Vy(cpu, instruction)
-    cpu.V[0xf] = AND(0x1, cpu.V[instruction.__y_])
-    cpu.V[instruction._x__] = RSHIFT(cpu.V[instruction.__y_], 1)
+    cpu.V[0xf] = BIT.band(0x1, cpu.V[instruction.__y_])
+    cpu.V[instruction._x__] = BIT.rshift(cpu.V[instruction.__y_], 1)
 
     cpu.ip = cpu.ip + 2
 end
@@ -193,8 +187,8 @@ end
 -- 8xyE - SHL Vx, Vy
 -- Set Vx = Vy SHL 1, set VF = bit shifted out
 local function i_8xyE_SHL_Vx_Vy(cpu, instruction)
-    cpu.V[0xf] = RSHIFT(cpu.V[instruction.__y_], 7)
-    cpu.V[instruction._x__] = AND(0xff, LSHIFT(cpu.V[instruction.__y_], 1))
+    cpu.V[0xf] = BIT.rshift(cpu.V[instruction.__y_], 7)
+    cpu.V[instruction._x__] = BIT.band(0xff, BIT.lshift(cpu.V[instruction.__y_], 1))
 
     cpu.ip = cpu.ip + 2
 end
@@ -226,7 +220,7 @@ end
 -- Cxkk - RND Vx, byte
 -- Set Vx = random byte AND kk.
 local function i_Cxkk_RND_Vx_byte(cpu, instruction)
-    cpu.V[instruction._x__] = AND(math.random(0, 0xff), instruction.__kk)
+    cpu.V[instruction._x__] = BIT.band(math.random(0, 0xff), instruction.__kk)
 
     cpu.ip = cpu.ip + 2
 end
@@ -249,8 +243,8 @@ local function i_Dxyn_DRW_Vx_Vy_nybble(cpu, instruction)
             x = w - x
             i = (y + oy) * cpu.width + (x + ox)
 
-            bit = AND(byte, 0x1)
-            byte = RSHIFT(byte, 1)
+            bit = BIT.band(byte, 0x1)
+            byte = BIT.rshift(byte, 1)
 
             if bit == 1 then
                 if display[i] == 1 then

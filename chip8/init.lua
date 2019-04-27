@@ -1,7 +1,3 @@
-local bitops = require 'lib.bitops'
-local AND = bitops.AND
-local RSHIFT = bitops.RSHIFT
-
 local decodeInstruction = require('chip8.instruction-set')
 
 local PROGRAM_START_ADDR = 0x200
@@ -140,12 +136,12 @@ function Chip8:cycle()
     local instruction = {
         raw  = word,
 
-        _nnn = AND(word, 0x0fff),
+        _nnn = bit.band(word, 0x0fff),
         __kk = byte2,
-        o___ = RSHIFT(AND(byte1, 0xf0), 4),
-        _x__ = AND(byte1, 0x0f),
-        __y_ = RSHIFT(AND(byte2, 0xf0), 4),
-        ___n = AND(byte2, 0x0f),
+        o___ = bit.rshift(bit.band(byte1, 0xf0), 4),
+        _x__ = bit.band(byte1, 0x0f),
+        __y_ = bit.rshift(bit.band(byte2, 0xf0), 4),
+        ___n = bit.band(byte2, 0x0f),
     }
 
     -- decode
@@ -179,8 +175,8 @@ function Chip8:loadProgram(instructions)
     -- first address for the program is at 0x200
     local p = PROGRAM_START_ADDR
     for _, inst in ipairs(instructions) do
-        self.memory[p] = RSHIFT(inst, 8)
-        self.memory[p + 1] = AND(inst, 0xff)
+        self.memory[p] = bit.rshift(inst, 8)
+        self.memory[p + 1] = bit.band(inst, 0xff)
         p = p + 2
     end
 
